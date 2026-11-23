@@ -7,19 +7,13 @@ spec:
   owner: group:default/platform-team
 ---
 apiVersion: backstage.io/v1alpha1
-kind: Resource
+kind: System
 metadata:
-  name: gcp-base-iac
-  title: GCP Base IaC
-  description: GCP Base IaC Repository
-  tags: [gcp]
-  links:
-    - url: https://github.com
-      title: GitHub Repository
+  name: cloud-infra
+  description: Core multi-cloud infrastructure and developer platform
 spec:
-  type: gcp
   owner: group:default/platform-team
-  system: cloud-infra
+---
 ---
 apiVersion: backstage.io/v1alpha1
 kind: Resource
@@ -35,24 +29,15 @@ spec:
   dependencyOf:
     - resource:default/gcp-base-iac
 ---
-apiVersion: backstage.io/v1alpha1
-kind: Resource
-metadata:
-  name: aws-base-iac
-  title: AWS Shared EKS Cluster
-  description: AWS Multi-Tenant Kubernetes Runtime
-  tags: [aws, dev]
-spec:
-  type: aws
-  owner: group:default/platform-team
-  system: cloud-infra
----
+# Repository 1: jarologic Repo
 apiVersion: backstage.io/v1alpha1
 kind: Component
 metadata:
   name: idp-portal
   title: Internal Developer Portal
   description: Core Backstage Developer Portal Repository
+  annotations:
+    ://github.com: mohapma/jarologic
   tags: [git, backstage]
   links:
     - url: https://github.com
@@ -60,5 +45,42 @@ metadata:
 spec:
   type: git-repository
   lifecycle: production
+  owner: group:default/platform-team
+  system: cloud-infra
+---
+# Repository 2: Templates & Catalog Repo
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: backstage-templates-repo
+  title: Backstage Templates & Catalog
+  description: Golden Path and Multi-Cloud Terraform Templates
+  annotations:
+    ://github.com: mohapma/backstage-templates
+  tags: [git, templates]
+  links:
+    - url: https://github.com
+      title: GitHub Repository
+spec:
+  type: git-repository
+  lifecycle: production
+  owner: group:default/platform-team
+  system: cloud-infra
+---
+# Repository 3: GCP Terraform Infra Repo
+apiVersion: backstage.io/v1alpha1
+kind: Resource
+metadata:
+  name: base-iac
+  title: Base IaC
+  description: Infrastructure as Code & Workflows
+  annotations:
+    ://github.com: mohapma/IaC
+  tags: [gcp, terraform]
+  links:
+    - url: https://github.com
+      title: GitHub Repository
+spec:
+  type: gcp
   owner: group:default/platform-team
   system: cloud-infra

@@ -67,7 +67,7 @@ spec:
   owner: group:default/platform-team
   system: cloud-infra
 ---
-# Repository 3: GCP Terraform Infra Repo
+# Repository 3: Terraform Infra Repo
 apiVersion: backstage.io/v1alpha1
 kind: Resource
 metadata:
@@ -76,7 +76,7 @@ metadata:
   description: Infrastructure as Code & Workflows
   annotations:
     ://github.com: mohapma/IaC
-  tags: [gcp, terraform]
+  tags: [terraform]
   links:
     - url: https://github.com
       title: GitHub Repository

@@ -1,0 +1,64 @@
+apiVersion: backstage.io/v1alpha1
+kind: System
+metadata:
+  name: cloud-infra
+  description: Core multi-cloud infrastructure and developer platform
+spec:
+  owner: group:default/platform-team
+---
+apiVersion: backstage.io/v1alpha1
+kind: Resource
+metadata:
+  name: gcp-base-iac
+  title: GCP Base IaC
+  description: GCP Base IaC Repository
+  tags: [gcp]
+  links:
+    - url: https://github.com
+      title: GitHub Repository
+spec:
+  type: gcp
+  owner: group:default/platform-team
+  system: cloud-infra
+---
+apiVersion: backstage.io/v1alpha1
+kind: Resource
+metadata:
+  name: gke-namespace
+  title: DEV
+  description: GKE Namespace
+  tags: [gcp, dev]
+spec:
+  type: gcp
+  owner: group:default/platform-team
+  system: cloud-infra
+  dependencyOf:
+    - resource:default/gcp-base-iac
+---
+apiVersion: backstage.io/v1alpha1
+kind: Resource
+metadata:
+  name: aws-base-iac
+  title: AWS Shared EKS Cluster
+  description: AWS Multi-Tenant Kubernetes Runtime
+  tags: [aws, dev]
+spec:
+  type: aws
+  owner: group:default/platform-team
+  system: cloud-infra
+---
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: idp-portal
+  title: Internal Developer Portal
+  description: Core Backstage Developer Portal Repository
+  tags: [git, backstage]
+  links:
+    - url: https://github.com
+      title: GitHub Repository
+spec:
+  type: git-repository
+  lifecycle: production
+  owner: group:default/platform-team
+  system: cloud-infra

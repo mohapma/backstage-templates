@@ -1,0 +1,78 @@
+apiVersion: scaffolder.backstage.io/v1beta3
+kind: Template
+metadata:
+  name: golden-path-microservice
+  title: Create Golden Path Service & Git Repo
+  description: Scaffolds a new GitHub repository with CI/CD workflow and registers it in the catalog.
+  tags:
+    - golden-path
+    - github
+    - microservice
+spec:
+  owner: group:default/platform-team
+  type: service
+
+  parameters:
+    - title: Service Details
+      required:
+        - name
+        - description
+      properties:
+        name:
+          title: Service Name
+          type: string
+          pattern: '^[a-z0-9-]+$'
+        description:
+          title: Description
+          type: string
+        language:
+          title: Runtime Stack
+          type: string
+          default: nodejs
+          enum: [nodejs, python, go]
+
+    - title: Target GitHub Repository
+      required:
+        - repoUrl
+      properties:
+        repoUrl:
+          title: New Repository Location
+          type: string
+          ui:field: RepoUrlPicker
+          ui:options:
+            allowedHosts:
+              - github.com
+
+  steps:
+    - id: fetch-base
+      name: Render Golden Path Skeleton
+      action: fetch:template
+      input:
+        url: ./content
+        values:
+          name: ${{ parameters.name }}
+          description: ${{ parameters.description }}
+          language: ${{ parameters.language }}
+
+    - id: publish
+      name: Create & Push GitHub Repository
+      action: publish:github
+      input:
+        repoUrl: ${{ parameters.repoUrl }}
+        description: ${{ parameters.description }}
+        defaultBranch: main
+
+    - id: register
+      name: Register in Backstage Catalog
+      action: catalog:register
+      input:
+        repoContentsUrl: ${{ steps['publish'].output.repoContentsUrl }}
+        catalogInfoPath: '/catalog-info.yaml'
+
+  output:
+    links:
+      - title: Open GitHub Repository
+        url: ${{ steps['publish'].output.remoteUrl }}
+      - title: Open in Catalog
+        icon: catalog
+        entityRef: ${{ steps['register'].output.entityRef }}

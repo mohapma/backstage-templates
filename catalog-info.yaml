@@ -1,13 +1,11 @@
 apiVersion: backstage.io/v1alpha1
-kind: Component
+kind: Location
 metadata:
-  name: idp
-  description: An example of a Backstage application.
-  # Example for optional annotations
-  # annotations:
-  #   github.com/project-slug: backstage/backstage
-  #   backstage.io/techdocs-ref: dir:.
+  name: platform-master-catalog
+  description: Master catalog index for systems, categorized resources, and software templates
 spec:
-  type: website
-  owner: john@example.com
-  lifecycle: experimental
+  targets:
+    - ./systems/org.yaml
+    - ./systems/platform-resources.yaml
+    - ./templates/golden-path-service/template.yaml
+    - ./templates/multi-cloud-infra/template.yaml

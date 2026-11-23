@@ -1,0 +1,15 @@
+apiVersion: backstage.io/v1alpha1
+kind: Resource
+metadata:
+  name: ${{ values.resourceName }}
+  title: ${{ values.resourceName }}
+  description: Provisioned ${{ values.cloudProvider | upper }} resource (${{ values.environment }})
+  tags:
+    - ${{ values.cloudProvider }}
+    - ${{ values.environment }}
+  annotations:
+    platform.io/billing-code: "${{ values.billingCode }}"
+spec:
+  type: ${{ values.cloudProvider }}
+  owner: group:default/platform-team
+  system: cloud-infra

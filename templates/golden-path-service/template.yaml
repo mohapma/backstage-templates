@@ -145,6 +145,7 @@ spec:
       input:
         repoUrl: ${{ parameters.parentRepoUrl }}
         sourcePath: ./parent-output/${{ parameters.name }}-${{ parameters.cloudProvider }}
+        targetPath: .
         branchName: add-${{ parameters.name }}-${{ parameters.cloudProvider }}-module
         title: 'feat(terraform): add ${{ parameters.name }} (${{ parameters.cloudProvider }}) child module'
         description: 'Declare the `${{ parameters.name }}-${{ parameters.cloudProvider }}` child from `mohapma/IaC`. Merge the IaC child-module PR before this parent PR.'

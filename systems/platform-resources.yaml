@@ -47,8 +47,6 @@ spec:
   type: aws
   owner: group:default/platform-team
   system: cloud-infra
-  dependencyOf:
-    - resource:default/gcp-base-iac
 ---
 # Repository 1: jarologic Repo
 apiVersion: backstage.io/v1alpha1

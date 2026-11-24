@@ -38,6 +38,7 @@ metadata:
     - url: https://github.com/mohapma/IaC/tree/main/jarologic-aws
       title: Terraform configuration
   annotations:
+    github.com/project-slug: mohapma/jarologic
     platform.io/aws-service: lightsail
     platform.io/aws-instance-name: jarologic-server
     platform.io/aws-region: us-east-1

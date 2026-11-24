@@ -129,27 +129,14 @@ spec:
         description: 'Add the base Terraform module for `${{ parameters.name }}` on `${{ parameters.cloudProvider }}`.'
         update: true
 
-    - id: fetch-parent-module
-      name: Render Parent Terraform Module Declaration
-      action: fetch:template
-      input:
-        url: ./orchestrator-content
-        targetPath: ./parent-output/${{ parameters.name }}-${{ parameters.cloudProvider }}
-        values:
-          name: ${{ parameters.name }}
-          cloudProvider: ${{ parameters.cloudProvider }}
-
-    - id: publish-parent-pr
+    - id: append-parent-module
       name: Add Terraform Child Module to Parent Root
-      action: publish:github:pull-request
+      action: github:append-terraform-module
       input:
         repoUrl: ${{ parameters.parentRepoUrl }}
-        sourcePath: ./parent-output/${{ parameters.name }}-${{ parameters.cloudProvider }}
-        targetPath: .
-        branchName: add-${{ parameters.name }}-${{ parameters.cloudProvider }}-module
-        title: 'feat(terraform): add ${{ parameters.name }} (${{ parameters.cloudProvider }}) child module'
-        description: 'Declare the `${{ parameters.name }}-${{ parameters.cloudProvider }}` child from `mohapma/IaC`. Merge the IaC child-module PR before this parent PR.'
-        update: true
+        iacRepoUrl: ${{ parameters.iacRepoUrl }}
+        serviceName: ${{ parameters.name }}
+        cloudProvider: ${{ parameters.cloudProvider }}
 
   output:
     links:
@@ -161,4 +148,4 @@ spec:
       - title: View Terraform Pull Request
         url: ${{ steps['publish-iac-pr'].output.remoteUrl }}
       - title: View Parent Terraform Pull Request
-        url: ${{ steps['publish-parent-pr'].output.remoteUrl }}
+        url: ${{ steps['append-parent-module'].output.remoteUrl }}

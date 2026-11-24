@@ -24,19 +24,3 @@ terraform {
   }
 {% endif %}
 }
-
-{% if values.cloudProvider == 'aws' %}
-provider "aws" {
-  region = var.region
-}
-{% elif values.cloudProvider == 'gcp' %}
-provider "google" {
-  project = var.project_id
-  region  = var.region
-}
-{% elif values.cloudProvider == 'azure' %}
-provider "azurerm" {
-  features {}
-  subscription_id = var.subscription_id
-}
-{% endif %}

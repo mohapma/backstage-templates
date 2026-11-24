@@ -3,7 +3,7 @@ kind: Template
 metadata:
   name: golden-path-microservice
   title: Create Golden Path Service & Git Repo
-  description: Scaffolds a service repository, asks for its cloud provider, and opens a Terraform PR in the IaC repository.
+  description: Scaffolds a service repository, creates a cloud Terraform child module, and adds it to the parent Terraform root.
   tags:
     - golden-path
     - github
@@ -65,6 +65,19 @@ spec:
             allowedHosts:
               - github.com
 
+    - title: Parent Terraform Repository
+      required:
+        - parentRepoUrl
+      properties:
+        parentRepoUrl:
+          title: Infrastructure Orchestrator Repository
+          type: string
+          default: github.com?owner=mohapma&repo=infra-orchestrator
+          ui:field: RepoUrlPicker
+          ui:options:
+            allowedHosts:
+              - github.com
+
   steps:
     - id: fetch-base
       name: Render Golden Path Skeleton
@@ -116,6 +129,27 @@ spec:
         description: 'Add the base Terraform module for `${{ parameters.name }}` on `${{ parameters.cloudProvider }}`.'
         update: true
 
+    - id: fetch-parent-module
+      name: Render Parent Terraform Module Declaration
+      action: fetch:template
+      input:
+        url: ./orchestrator-content
+        targetPath: ./parent-output/${{ parameters.name }}-${{ parameters.cloudProvider }}
+        values:
+          name: ${{ parameters.name }}
+          cloudProvider: ${{ parameters.cloudProvider }}
+
+    - id: publish-parent-pr
+      name: Add Terraform Child Module to Parent Root
+      action: publish:github:pull-request
+      input:
+        repoUrl: ${{ parameters.parentRepoUrl }}
+        sourcePath: ./parent-output/${{ parameters.name }}-${{ parameters.cloudProvider }}
+        branchName: add-${{ parameters.name }}-${{ parameters.cloudProvider }}-module
+        title: 'feat(terraform): add ${{ parameters.name }} (${{ parameters.cloudProvider }}) child module'
+        description: 'Declare the `${{ parameters.name }}-${{ parameters.cloudProvider }}` child from `mohapma/IaC`. Merge the IaC child-module PR before this parent PR.'
+        update: true
+
   output:
     links:
       - title: Open GitHub Repository
@@ -125,3 +159,5 @@ spec:
         entityRef: ${{ steps['register'].output.entityRef }}
       - title: View Terraform Pull Request
         url: ${{ steps['publish-iac-pr'].output.remoteUrl }}
+      - title: View Parent Terraform Pull Request
+        url: ${{ steps['publish-parent-pr'].output.remoteUrl }}

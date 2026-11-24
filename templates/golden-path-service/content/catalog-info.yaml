@@ -5,6 +5,7 @@ metadata:
   description: ${{ values.description }}
   tags:
     - ${{ values.language }}
+    - ${{ values.cloudProvider }}
     - golden-path
 spec:
   type: git-repository

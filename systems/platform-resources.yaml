@@ -26,6 +26,27 @@ spec:
   type: gcp
   owner: group:default/platform-team
   system: cloud-infra
+---
+apiVersion: backstage.io/v1alpha1
+kind: Resource
+metadata:
+  name: jarologic-server
+  title: Jarologic AWS Lightsail Server
+  description: AWS Lightsail instance jarologic-server in us-east-1 (us-east-1a), managed with Terraform. The stack includes a static IP and allows SSH, HTTP, and HTTPS ingress.
+  tags: [aws, lightsail, terraform]
+  links:
+    - url: https://github.com/mohapma/IaC/tree/main/jarologic-aws
+      title: Terraform configuration
+  annotations:
+    platform.io/aws-service: lightsail
+    platform.io/aws-instance-name: jarologic-server
+    platform.io/aws-region: us-east-1
+    platform.io/aws-availability-zone: us-east-1a
+    platform.io/terraform-path: jarologic-aws
+spec:
+  type: aws
+  owner: group:default/platform-team
+  system: cloud-infra
   dependencyOf:
     - resource:default/gcp-base-iac
 ---

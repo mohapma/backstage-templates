@@ -3,7 +3,7 @@ kind: Template
 metadata:
   name: golden-path-microservice
   title: Create Golden Path Service & Git Repo
-  description: Scaffolds a new GitHub repository with CI/CD workflow and registers it in the catalog.
+  description: Scaffolds a service repository, asks for its cloud provider, and opens a Terraform PR in the IaC repository.
   tags:
     - golden-path
     - github
@@ -17,6 +17,7 @@ spec:
       required:
         - name
         - description
+        - cloudProvider
       properties:
         name:
           title: Service Name
@@ -30,6 +31,15 @@ spec:
           type: string
           default: nodejs
           enum: [nodejs, python, go]
+        cloudProvider:
+          title: Cloud Provider
+          type: string
+          default: aws
+          enum: [aws, gcp, azure]
+          enumNames:
+            - Amazon Web Services (AWS)
+            - Google Cloud Platform (GCP)
+            - Microsoft Azure (Azure)
 
     - title: Target GitHub Repository
       required:
@@ -37,6 +47,18 @@ spec:
       properties:
         repoUrl:
           title: New Repository Location
+          type: string
+          ui:field: RepoUrlPicker
+          ui:options:
+            allowedHosts:
+              - github.com
+
+    - title: Target IaC Repository
+      required:
+        - iacRepoUrl
+      properties:
+        iacRepoUrl:
+          title: Infrastructure Repository Location
           type: string
           ui:field: RepoUrlPicker
           ui:options:
@@ -53,6 +75,7 @@ spec:
           name: ${{ parameters.name }}
           description: ${{ parameters.description }}
           language: ${{ parameters.language }}
+          cloudProvider: ${{ parameters.cloudProvider }}
 
     - id: publish
       name: Create & Push GitHub Repository
@@ -69,6 +92,30 @@ spec:
         repoContentsUrl: ${{ steps['publish'].output.repoContentsUrl }}
         catalogInfoPath: '/catalog-info.yaml'
 
+    - id: fetch-iac
+      name: Render Cloud Terraform Module
+      action: fetch:template
+      input:
+        url: ../multi-cloud-infra/content
+        targetPath: ./infra-output/${{ parameters.name }}-${{ parameters.cloudProvider }}
+        values:
+          cloudProvider: ${{ parameters.cloudProvider }}
+          resourceName: ${{ parameters.name }}
+          environment: dev
+          billingCode: '448325'
+
+    - id: publish-iac-pr
+      name: Add Terraform Folder to IaC Repository
+      action: publish:github:pull-request
+      input:
+        repoUrl: ${{ parameters.iacRepoUrl }}
+        sourcePath: ./infra-output/${{ parameters.name }}-${{ parameters.cloudProvider }}
+        targetPath: ${{ parameters.name }}-${{ parameters.cloudProvider }}
+        branchName: add-${{ parameters.name }}-${{ parameters.cloudProvider }}-terraform
+        title: 'feat(terraform): add ${{ parameters.name }} (${{ parameters.cloudProvider }})'
+        description: 'Add the base Terraform module for `${{ parameters.name }}` on `${{ parameters.cloudProvider }}`.'
+        update: true
+
   output:
     links:
       - title: Open GitHub Repository
@@ -76,3 +123,5 @@ spec:
       - title: Open in Catalog
         icon: catalog
         entityRef: ${{ steps['register'].output.entityRef }}
+      - title: View Terraform Pull Request
+        url: ${{ steps['publish-iac-pr'].output.remoteUrl }}

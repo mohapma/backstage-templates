@@ -2,8 +2,8 @@ apiVersion: backstage.io/v1alpha1
 kind: Resource
 metadata:
   name: ${{ values.resourceName }}
-  title: ${{ values.resourceName }}
-  description: Provisioned ${{ values.cloudProvider | upper }} resource (${{ values.environment }})
+  title: ${{ values.resourceName }} ${{ values.cloudProvider | upper }} infrastructure
+  description: Terraform infrastructure project for ${{ values.resourceName }} on ${{ values.cloudProvider | upper }} (${{ values.environment }})
   tags:
     - ${{ values.cloudProvider }}
     - ${{ values.environment }}

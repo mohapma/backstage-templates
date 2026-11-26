@@ -23,11 +23,31 @@ variable "billing_code" {
 }
 
 variable "project_id" {
-  description = "GCP project ID; set when deploying to Google Cloud."
+  description = "Google Cloud project ID."
   type        = string
+{% if values.cloudProvider == 'gcp' %}
+  default     = "${{ values.gcpProjectId }}"
+  nullable    = false
+{% else %}
   default     = null
   nullable    = true
+{% endif %}
 }
+
+{% if values.cloudProvider == 'gcp' %}
+variable "gcp_org_id" {
+  description = "Google Cloud organization ID under which to create the project."
+  type        = string
+  nullable    = false
+}
+
+variable "gcp_billing_account" {
+  description = "Google Cloud billing account ID to link to the new project."
+  type        = string
+  nullable    = false
+  sensitive   = true
+}
+{% endif %}
 
 variable "subscription_id" {
   description = "Azure subscription ID; set when deploying to Microsoft Azure."

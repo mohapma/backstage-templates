@@ -40,6 +40,21 @@ spec:
             - Amazon Web Services (AWS)
             - Google Cloud Platform (GCP)
             - Microsoft Azure (Azure)
+      dependencies:
+        cloudProvider:
+          oneOf:
+            - properties:
+                cloudProvider:
+                  const: gcp
+                gcpProjectId:
+                  title: New GCP Project ID
+                  description: Enter a globally unique ID for the new Google Cloud project.
+                  type: string
+                  pattern: '^[a-z][a-z0-9-]{4,28}[a-z0-9]$'
+              required: [gcpProjectId]
+            - properties:
+                cloudProvider:
+                  enum: [aws, azure]
 
     - title: Target GitHub Repository
       required:
@@ -116,6 +131,7 @@ spec:
           resourceName: ${{ parameters.name }}
           environment: dev
           billingCode: '448325'
+          gcpProjectId: ${{ parameters.gcpProjectId }}
 
     - id: publish-iac-pr
       name: Add Terraform Folder to IaC Repository
@@ -137,6 +153,7 @@ spec:
         iacRepoUrl: ${{ parameters.iacRepoUrl }}
         serviceName: ${{ parameters.name }}
         cloudProvider: ${{ parameters.cloudProvider }}
+        gcpProjectId: ${{ parameters.gcpProjectId }}
 
   output:
     links:

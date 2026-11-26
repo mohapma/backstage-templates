@@ -10,3 +10,16 @@ locals {
     ManagedBy   = "terraform"
   }
 }
+{% if values.cloudProvider == 'gcp' %}
+
+resource "google_project" "service" {
+  name            = var.project_id
+  project_id      = var.project_id
+  org_id          = var.gcp_org_id
+  billing_account = var.gcp_billing_account
+
+  lifecycle {
+    prevent_destroy = true
+  }
+}
+{% endif %}

@@ -12,3 +12,10 @@ output "common_tags" {
   description = "Common tags to apply to project infrastructure."
   value       = local.common_tags
 }
+{% if values.cloudProvider == 'gcp' %}
+
+output "gcp_project_id" {
+  description = "ID of the Google Cloud project created by this module."
+  value       = google_project.service.project_id
+}
+{% endif %}

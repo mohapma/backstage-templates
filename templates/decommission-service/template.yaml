@@ -1,0 +1,67 @@
+apiVersion: scaffolder.backstage.io/v1beta3
+kind: Template
+metadata:
+  name: decommission-service
+  title: Decommission Terraform Service
+  description: Opens pull requests to remove a service's Terraform module and its infrastructure folder.
+spec:
+  owner: group:default/platform-team
+  type: service
+  parameters:
+    - title: Service to decommission
+      required: [serviceName, cloudProvider, confirmRemoval]
+      properties:
+        serviceName:
+          title: Service name
+          type: string
+          maxLength: 63
+          pattern: '^[a-z0-9-]+$'
+        cloudProvider:
+          title: Cloud provider
+          type: string
+          enum: [aws, gcp, azure]
+        confirmRemoval:
+          title: I understand that merging the parent pull request can destroy Terraform-managed resources.
+          type: boolean
+          const: true
+  steps:
+    - id: prepare
+      name: Locate and prepare Terraform removal
+      if: ${{ parameters.confirmRemoval === true }}
+      action: github:prepareTerraformRemoval
+      input:
+        serviceName: ${{ parameters.serviceName }}
+        cloudProvider: ${{ parameters.cloudProvider }}
+        confirmRemoval: ${{ parameters.confirmRemoval }}
+    - id: parent
+      name: Open parent Terraform removal pull request
+      if: ${{ parameters.confirmRemoval === true }}
+      action: publish:github:pull-request
+      input:
+        repoUrl: github.com?owner=mohapma&repo=infra-orchestrator
+        targetBranchName: main
+        sourcePath: parent
+        branchName: remove-${{ parameters.serviceName }}-${{ parameters.cloudProvider }}-module
+        title: Remove Terraform module for ${{ parameters.serviceName }} (${{ parameters.cloudProvider }})
+        description: Merging this pull request can trigger Terraform to destroy the service's resources. Review the intended destruction before merging. Keep the infrastructure folder until the parent apply succeeds.
+        update: true
+    - id: folder
+      name: Open draft infrastructure folder removal pull request
+      if: ${{ parameters.confirmRemoval === true }}
+      action: publish:github:pull-request
+      input:
+        repoUrl: ${{ steps.prepare.output.iacRepoUrl }}
+        targetBranchName: main
+        sourcePath: folder-removal
+        filesToDelete: ${{ steps.prepare.output.filesToDelete }}
+        branchName: remove-${{ parameters.serviceName }}-${{ parameters.cloudProvider }}-folder
+        title: Remove Terraform folder for ${{ parameters.serviceName }} (${{ parameters.cloudProvider }})
+        description: Mark ready and merge after the parent module removal is merged and Terraform apply succeeds.
+        draft: true
+        update: true
+  output:
+    links:
+      - title: Review parent Terraform removal first
+        url: ${{ steps.parent.output.remoteUrl }}
+      - title: Review infrastructure folder removal after the parent apply
+        url: ${{ steps.folder.output.remoteUrl }}

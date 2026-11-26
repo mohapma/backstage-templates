@@ -9,3 +9,4 @@ spec:
     - ./systems/platform-resources.yaml
     - ./templates/golden-path-service/template.yaml
     - ./templates/multi-cloud-infra/template.yaml
+    - ./templates/decommission-service/template.yaml
